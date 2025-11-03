@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎂 蜡笔小新的生日祝福 🎂</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', 'Ma Shan Zheng', sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: linear-gradient(135deg, #ffe4e1 0%, #ffd6f0 25%, #b3e5fc 50%, #fff8dc 75%, #ffd8b3 100%);
+            background-size: 400% 400%;
+            animation: gradientFlow 20s ease infinite;
+        }
+
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 背景图层 */
+        .background-image {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background-image: url('OIP.webp');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.18;
+            z-index: 0;
+            filter: blur(1px);
+        }
+
+        /* 粒子动画层 */
+        .particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            opacity: 0.7;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 生日祝福弹幕 - 堆叠效果 */
+        .wish-bubble {
+            position: fixed;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, rgba(255, 218, 185, 0.92) 0%, rgba(255, 182, 193, 0.92) 100%);
+            border-radius: 20px;
+            color: #ff1493;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(255, 140, 0, 0.4);
+            z-index: 10;
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            white-space: nowrap;
+            text-align: center;
+            animation: fadeInScale 0.5s ease-out forwards;
+            font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+            opacity: 0;
+        }
+
+        @keyframes fadeInScale {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* 信封容器 */
+        .envelope-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 100;
+            cursor: pointer;
+            filter: drop-shadow(0 15px 35px rgba(255, 140, 0, 0.4));
+            opacity: 0;
+        }
+        
+        .envelope-container.show {
+            animation: envelopeAppear 1.5s ease forwards;
+        }
+
+        @keyframes envelopeAppear {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotateY(0deg);
+                opacity: 0;
+            }
+            60% {
+                transform: translate(-50%, -50%) scale(1.15) rotateY(180deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1) rotateY(360deg);
+                opacity: 1;
+            }
+        }
+
+        .envelope {
+            width: 300px;
+            height: 200px;
+            position: relative;
+            transition: all 0.5s ease;
+        }
+
+        .envelope:hover {
+            transform: scale(1.08) translateY(-5px);
+        }
+
+        .envelope-body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fff5ee 0%, #ffe4e1 50%, #ffd6f0 100%);
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(255, 140, 0, 0.5);
+            position: relative;
+            border: 4px solid #ffa500;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid #ffb6c1;
+            transform-origin: top;
+            transition: all 1s ease;
+            z-index: 2;
+        }
+
+        .envelope.open .envelope-flap {
+            transform: rotateX(180deg);
+            border-top-color: #ffa07a;
+        }
+
+        .envelope-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 26px;
+            color: #ff6347;
+            font-weight: bold;
+            text-shadow: 2px 2px 6px rgba(255, 255, 255, 0.9);
+            z-index: 3;
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+
+        .birthday-icon {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 30px;
+            animation: bounce 1s infinite;
+            z-index: 3;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* 信件内容 */
+        .letter-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 250, 240, 0.97) 0%, rgba(255, 248, 220, 0.97) 100%);
+            z-index: 200;
+            display: none;
+            overflow-y: auto;
+            animation: fadeIn 1.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .letter-paper {
+            max-width: 850px;
+            margin: 60px auto;
+            padding: 70px;
+            background: linear-gradient(to bottom, #fffaf5 0%, #fff8f0 100%);
+            box-shadow: 0 25px 70px rgba(255, 140, 0, 0.3);
+            border-radius: 20px;
+            border: 4px solid #ffdab9;
+            position: relative;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 32px,
+                    rgba(255, 200, 150, 0.12) 32px,
+                    rgba(255, 200, 150, 0.12) 33px
+                );
+        }
+
+        .letter-paper::before {
+            content: '🎂';
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            font-size: 45px;
+            opacity: 0.4;
+        }
+
+        .letter-paper::after {
+            content: '🎈';
+            position: absolute;
+            bottom: 25px;
+            left: 35px;
+            font-size: 40px;
+            opacity: 0.4;
+        }
+
+        .letter-title {
+            text-align: center;
+            font-size: 36px;
+            color: #ff6347;
+            margin-bottom: 35px;
+            font-family: 'Ma Shan Zheng', cursive;
+            text-shadow: 2px 2px 6px rgba(255, 200, 150, 0.5);
+        }
+
+        .letter-content {
+            font-size: 19px;
+            line-height: 2.1;
+            color: #555;
+            text-indent: 2em;
+            margin-bottom: 22px;
+            opacity: 0;
+            animation: textAppear 1s ease forwards;
+        }
+
+        @keyframes textAppear {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .letter-ending {
+            text-align: right;
+            font-size: 22px;
+            color: #ff6347;
+            margin-top: 45px;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-style: italic;
+        }
+
+        .letter-signature {
+            text-align: right;
+            font-size: 24px;
+            color: #ff4500;
+            margin-top: 25px;
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+
+        .final-quote {
+            text-align: center;
+            font-size: 16px;
+            color: #999;
+            margin-top: 60px;
+            font-style: italic;
+            opacity: 0;
+            animation: fadeInSlow 2s ease forwards;
+            animation-delay: 3s;
+        }
+
+        @keyframes fadeInSlow {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* 音乐控制按钮 */
+        .music-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.95) 0%, rgba(255, 140, 0, 0.95) 100%);
+            border-radius: 50%;
+            border: 3px solid #fff;
+            cursor: pointer;
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .music-control:hover {
+            transform: scale(1.15) rotate(10deg);
+            box-shadow: 0 8px 25px rgba(255, 140, 0, 0.7);
+        }
+
+        .music-control.playing {
+            animation: musicPulse 1.5s ease infinite;
+        }
+
+        @keyframes musicPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        /* 心形粒子效果 */
+        .heart-particle {
+            position: fixed;
+            color: #ff69b4;
+            font-size: 22px;
+            pointer-events: none;
+            z-index: 9999;
+            animation: heartFloat 2.5s ease-out forwards;
+        }
+
+        @keyframes heartFloat {
+            0% {
+                transform: translateY(0) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-120px) scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 流星特效 */
+        .shooting-star {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+            z-index: 150;
+            animation: shootingStar 1.5s ease-out forwards;
+        }
+
+        @keyframes shootingStar {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-300px, 300px);
+                opacity: 0;
+                box-shadow: 0 0 20px 4px rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        /* 开始提示 */
+        .start-hint {
+            position: fixed;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.92);
+            padding: 18px 35px;
+            border-radius: 30px;
+            font-size: 20px;
+            color: #ff6347;
+            z-index: 150;
+            box-shadow: 0 6px 25px rgba(255, 140, 0, 0.35);
+            animation: hintBounce 2.5s ease infinite;
+        }
+
+        @keyframes hintBounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-12px);
+            }
+        }
+
+        /* 开始按钮 */
+        .start-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 500;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ffa07a 50%, #ff69b4 100%);
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            padding: 30px 70px;
+            border-radius: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 15px 50px rgba(255, 105, 180, 0.6),
+                        0 0 0 0 rgba(255, 105, 180, 0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: buttonPulse 2s ease-in-out infinite;
+            font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .start-button:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.8),
+                        0 0 0 20px rgba(255, 105, 180, 0.2);
+        }
+
+        .start-button:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+
+        @keyframes buttonPulse {
+            0%, 100% {
+                box-shadow: 0 15px 50px rgba(255, 105, 180, 0.6),
+                            0 0 0 0 rgba(255, 105, 180, 0.7);
+            }
+            50% {
+                box-shadow: 0 15px 50px rgba(255, 105, 180, 0.8),
+                            0 0 0 15px rgba(255, 105, 180, 0);
+            }
+        }
+
+        .start-button.hide {
+            animation: buttonDisappear 0.8s ease forwards;
+        }
+
+        @keyframes buttonDisappear {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .letter-paper {
+                margin: 25px;
+                padding: 35px;
+            }
+            
+            .letter-content {
+                font-size: 17px;
+            }
+            
+            .envelope {
+                width: 240px;
+                height: 160px;
+            }
+            
+            .envelope-flap {
+                border-left: 120px solid transparent;
+                border-right: 120px solid transparent;
+                border-top: 80px solid #ffb6c1;
+            }
+
+            .wish-bubble {
+                font-size: 14px;
+                padding: 10px 18px;
+                border-radius: 15px;
+            }
+
+            .start-button {
+                font-size: 24px;
+                padding: 25px 50px;
+                border-radius: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景图层 -->
+    <div class="background-image"></div>
+    
+    <!-- 开始按钮 -->
+    <div class="start-button" id="startButton">🎂 点击开始 🎉</div>
+    
+    <!-- 粒子容器 -->
+    <div class="particle-container" id="particleContainer"></div>
+    
+    <!-- 信封 -->
+    <div class="envelope-container" id="envelopeContainer" style="display: none;">
+        <div class="envelope" id="envelope">
+            <div class="envelope-body">
+                <div class="envelope-flap"></div>
+                <div class="birthday-icon">🎂</div>
+                <div class="envelope-text">点我打开生日信 🎁</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 信件内容 -->
+    <div class="letter-container" id="letterContainer">
+        <div class="letter-paper">
+            <div class="letter-title">🎈 今天是你的生日 🎈</div>
+            
+            <div class="letter-content" style="animation-delay: 0.2s;">
+                嘿！今天的你，又长大了一岁哦～就像小新说的："长大一岁，就能多吃一个蛋糕！"虽然这话听起来有点傻，但想想，能多活一年，多笑一年，多和喜欢的人在一起一年，是不是超级幸运呢？
+            </div>
+            
+            <div class="letter-content" style="animation-delay: 0.4s;">
+                你知道吗？蜡笔小新总是无忧无虑的，因为他懂得在每一天里找到快乐。我希望你也是这样的人——不管遇到什么，都能像向日葵一样，永远朝着阳光的方向生长。你的笑容，就是这个世界上最温暖的阳光。
+            </div>
+            
+            <div class="letter-content" style="animation-delay: 0.6s;">
+                还记得小新和小白的故事吗？他们总是一起散步，一起玩耍，一起分享零食。我想对你说：在你的人生路上，愿你也能找到这样的陪伴——无论晴天雨天，都有人愿意陪你走过每一段旅程。而我，很幸运能成为你生命中的一部分。
+            </div>
+            
+            <div class="letter-content" style="animation-delay: 0.8s;">
+                生日这一天，天空中的星星都在为你闪烁。它们说："这个人真好，值得所有美好的事情。"是啊，你就是那么特别——善良、温柔、有趣，像夜空中最亮的那颗星，照亮了周围所有人的世界。
+            </div>
+            
+            <div class="letter-content" style="animation-delay: 1.0s;">
+                如果用小新的语气来说生日祝福，那就是："今天你最大！想吃什么就吃什么，想玩什么就玩什么，想笑就大声笑！"但我还想加一句：今天你最棒，因为你就是你，独一无二的你。
+            </div>
+            
+            <div class="letter-content" style="animation-delay: 1.2s;">
+                我在星星里藏了一个小小的心愿：愿你的每一天都充满欢笑，愿你遇到的每个人都对你温柔以待，愿你的梦想都能一个个实现，愿你永远保持这份童真和热爱生活的心。就像小新一样，永远充满活力，永远对世界好奇。
+            </div>
+            
+            <div class="letter-content" style="animation-delay: 1.4s;">
+                人生就像小新的冒险一样，有时候会遇到困难，有时候会有惊喜。但不管怎样，请你记住：你不是一个人在战斗。有很多人在背后支持你，爱着你，包括我。我们会在你需要的时候，给你最温暖的拥抱。
+            </div>
+            
+            <div class="letter-content" style="animation-delay: 1.6s;">
+                希望你的新一岁，能像小新的世界一样充满色彩：粉色的温柔，蓝色的自由，黄色的快乐，绿色的希望。愿你的生活像彩虹一样美丽，像向日葵一样灿烂，像棉花糖一样甜蜜。
+            </div>
+            
+            <div class="letter-content" style="animation-delay: 1.8s;">
+                最后，我想用最简单的话对你说：生日快乐！愿你今天吃到最好吃的蛋糕，收到最棒的礼物，听到最温暖的祝福。愿你的笑容，能像今天的阳光一样，永远灿烂。
+            </div>
+            
+            <div class="letter-ending" style="animation-delay: 2.0s;">
+                "愿你在每个平凡的日子里，都能闪闪发光，像夜空中最亮的星。"
+            </div>
+            
+            <div class="letter-signature" style="animation-delay: 2.2s;">
+                —— 永远爱你的朋友 🌟<br>
+                2025年11月3日
+            </div>
+
+            <div class="final-quote">
+                让这份代码，不只是祝福，而是一场温柔的生日仪式。
+            </div>
+        </div>
+    </div>
+    
+    <!-- 提示文字 -->
+    <div class="start-hint" id="startHint" style="display: none;">
+        生日惊喜正在准备中... 🎂✨
+    </div>
+    
+    <!-- 音乐控制 -->
+    <div class="music-control" id="musicControl">🎵</div>
+    
+    <!-- 背景音乐 - 夜空中最亮的星 -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="夜空中最亮的星 - 逃跑计划.mp3" type="audio/mpeg">
+        <!-- 备选文件名 -->
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // 生日祝福语库（弹幕专用 - 超多版本）
+        const birthdayWishes = [
+            "🎂 今天的小新，长大一岁啦～",
+            "🎈 愿你笑口常开，像小新一样快乐无敌！",
+            "✨ 愿所有温柔和好运都奔向你！",
+            "🌻 你的生日，连向日葵都在笑～",
+            "⭐ 你是我心里最亮的那颗星，生日快乐！",
+            "💝 有你在的每一天，都是特别的一天",
+            "🌸 愿你的梦想都开花结果",
+            "🎁 今天你最大，想干嘛就干嘛！",
+            "🌈 像小新一样，每天都元气满满！",
+            "🎉 生日快乐！愿你永远童心未泯～",
+            "💕 新的一岁，要更加幸福哦！",
+            "🍰 你的笑容，比蛋糕还要甜",
+            "🌟 愿你被这个世界温柔以待",
+            "🎊 今天的主角，就是你呀！",
+            "💖 祝你永远快乐，永远热爱生活",
+            "🌻 像向日葵一样，永远朝着阳光",
+            "🎈 愿你拥有小新的快乐和勇气",
+            "✨ 生日这天，所有美好都属于你",
+            "⭐ 愿你的每一天都闪闪发光",
+            "🎁 新的一岁，新的冒险开始啦！",
+            "💝 要一直这么可爱下去哦～",
+            "🎂 生日快乐！愿你心想事成！",
+            "🎁 你的存在，就是最好的礼物",
+            "🌈 今天的你，是全世界最幸福的人",
+            "✨ 愿你永远保持这份纯真和美好",
+            "🎉 生日快乐！要幸福到一百岁！",
+            "🐕 像小白一样，永远忠于自己的快乐",
+            "🕯️ 今天吹的蜡烛，都是希望的光芒",
+            "🌟 愿你的未来，比想象中更美好",
+            "⭐ 生日这天，连星星都在为你庆祝",
+            "🎂 Happy Birthday! 生日快乐！",
+            "🎈 愿你18岁/永远18岁！",
+            "💕 今天要吃三个蛋糕才够！",
+            "🌸 比小新还可爱的生日寿星！",
+            "🎁 收到这条弹幕的人会超级幸运！",
+            "✨ 许下的愿望都会实现哦～",
+            "🌟 今天全世界都为你让路！",
+            "🎊 生日快乐！天天开心！",
+            "💖 愿你被爱包围的每一天",
+            "🎉 新的一岁，更加精彩！",
+            "🌈 你就是今天最闪亮的星！",
+            "🎂 吃蛋糕不长胖的魔法日！",
+            "🎈 生日快乐！万事胜意！",
+            "💝 今天的你，拥有主角光环！",
+            "🌻 阳光、快乐、生日快乐！",
+            "⭐ 愿你的笑容永远灿烂",
+            "🎁 今天收礼物收到手软！",
+            "✨ 生日快乐！平安喜乐！",
+            "🌸 愿你如花般绽放每一天",
+            "🎊 今天必须要开心到飞起！",
+            "💕 最好的年纪，最美的你！",
+            "🎂 蛋糕有多甜，你就有多甜！",
+            "🎈 生日快乐！顺遂无忧！",
+            "🌟 今天的寿星最可爱！",
+            "🎉 愿你有无限的快乐和爱！",
+            "💖 生日快乐！事事如意！",
+            "🌈 彩虹为你而现！",
+            "✨ 今天你就是公主/王子！",
+            "🎁 愿你收获满满的惊喜！",
+            "🌻 像小新一样勇敢追梦！",
+            "⭐ 星光不问赶路人，生日快乐！",
+            "🎂 愿你岁岁平安，年年有你！",
+            "🎈 今天必须要嗨到天亮！",
+            "💝 你的生日，全世界的节日！",
+            "🌸 愿你永远年轻，永远热泪盈眶！",
+            "🎊 生日快乐！前程似锦！",
+            "💕 今天要收到100个祝福！",
+            "🎉 愿你拥有小新的快乐秘诀！",
+            "🌟 闪闪发光的生日寿星！",
+            "✨ 今天开启幸运模式！",
+            "🎁 愿你的人生像开挂一样顺利！",
+            "🌈 生日快乐！步步高升！",
+            "🎂 今天的蛋糕一定超好吃！",
+            "🎈 愿你一生被爱，一生可爱！",
+            "💖 生日快乐！健康快乐！",
+            "🌻 向阳而生，生日快乐！",
+            "⭐ 今天的主角光环闪瞎眼！",
+            "🎉 愿你的生活充满惊喜！",
+            "💝 比小新还幸福的你！",
+            "🌸 花儿为你开，生日快乐！",
+            "✨ 今天要许三个愿望！",
+            "🎊 生日快乐！岁岁常欢愉！"
+        ];
+
+        // 音乐控制 - 《夜空中最亮的星》点击后播放
+        const bgMusic = document.getElementById('bgMusic');
+        const musicControl = document.getElementById('musicControl');
+        let isMusicPlaying = false;
+        let hasStarted = false; // 是否已经点击开始按钮
+
+        // 尝试播放音乐的函数
+        function tryPlayMusic() {
+            if (!isMusicPlaying && hasStarted) {
+                bgMusic.play().then(() => {
+                    isMusicPlaying = true;
+                    musicControl.textContent = '🎶';
+                    musicControl.classList.add('playing');
+                    console.log('🎵 《夜空中最亮的星》开始播放');
+                }).catch(e => {
+                    console.log('音乐播放失败:', e);
+                });
+            }
+        }
+
+        // 音乐控制按钮
+        musicControl.addEventListener('click', () => {
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                musicControl.textContent = '🎵';
+                musicControl.classList.remove('playing');
+                isMusicPlaying = false;
+            } else {
+                tryPlayMusic();
+            }
+        });
+
+        // 立即设置音量
+        bgMusic.volume = 0.6;
+
+        // 音频开始播放时更新状态
+        bgMusic.addEventListener('play', () => {
+            isMusicPlaying = true;
+            musicControl.textContent = '🎶';
+            musicControl.classList.add('playing');
+        });
+
+        // 音频暂停时更新状态
+        bgMusic.addEventListener('pause', () => {
+            isMusicPlaying = false;
+            musicControl.textContent = '🎵';
+            musicControl.classList.remove('playing');
+        });
+
+        // 生成粒子
+        function createParticles() {
+            const container = document.getElementById('particleContainer');
+            const particles = ['🎂', '🎈', '🎁', '🎉', '⭐', '✨', '🌸', '🦋', '🌟', '💝', '🎊', '🍰'];
+            
+            setInterval(() => {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.textContent = particles[Math.floor(Math.random() * particles.length)];
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
+                particle.style.fontSize = (Math.random() * 15 + 15) + 'px';
+                container.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 12000);
+            }, 1000);
+        }
+
+        // 生成满屏弹幕祝福 - 堆叠铺满版本（不消失）
+        function createWishBubbles() {
+            // 第一波 - 快速铺满屏幕（150个弹幕）
+            for (let i = 0; i < 150; i++) {
+                setTimeout(() => {
+                    createSingleDanmaku();
+                }, i * 40);
+            }
+            
+            // 延迟后继续添加更多，确保铺满
+            setTimeout(() => {
+                for (let i = 0; i < 100; i++) {
+                    setTimeout(() => {
+                        createSingleDanmaku();
+                    }, i * 50);
+                }
+            }, 6000);
+            
+            // 最后一波补充
+            setTimeout(() => {
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        createSingleDanmaku();
+                    }, i * 60);
+                }
+            }, 11000);
+            
+            // 铺满后就不再生成了
+        }
+        
+        // 创建单条弹幕 - 随机位置堆叠（不删除）
+        function createSingleDanmaku() {
+            const bubble = document.createElement('div');
+            bubble.className = 'wish-bubble';
+            bubble.textContent = birthdayWishes[Math.floor(Math.random() * birthdayWishes.length)];
+            
+            // 随机位置（覆盖整个屏幕）
+            const topPosition = Math.random() * 90 + 5; // 5% 到 95% 的高度
+            const leftPosition = Math.random() * 90 + 5; // 5% 到 95% 的宽度
+            bubble.style.top = topPosition + '%';
+            bubble.style.left = leftPosition + '%';
+            
+            // 随机颜色变化
+            const colorVariants = [
+                'linear-gradient(135deg, rgba(255, 218, 185, 0.92) 0%, rgba(255, 182, 193, 0.92) 100%)',
+                'linear-gradient(135deg, rgba(255, 192, 203, 0.92) 0%, rgba(255, 182, 193, 0.92) 100%)',
+                'linear-gradient(135deg, rgba(255, 228, 181, 0.92) 0%, rgba(255, 218, 185, 0.92) 100%)',
+                'linear-gradient(135deg, rgba(255, 240, 245, 0.92) 0%, rgba(255, 182, 193, 0.92) 100%)',
+                'linear-gradient(135deg, rgba(176, 224, 230, 0.92) 0%, rgba(173, 216, 230, 0.92) 100%)',
+                'linear-gradient(135deg, rgba(255, 182, 193, 0.92) 0%, rgba(255, 105, 180, 0.92) 100%)',
+                'linear-gradient(135deg, rgba(255, 239, 213, 0.92) 0%, rgba(255, 218, 185, 0.92) 100%)'
+            ];
+            bubble.style.background = colorVariants[Math.floor(Math.random() * colorVariants.length)];
+            
+            // 随机字体大小
+            const fontSize = Math.random() * 5 + 15; // 15-20px
+            bubble.style.fontSize = fontSize + 'px';
+            
+            // 随机z-index，增加层叠感
+            bubble.style.zIndex = Math.floor(Math.random() * 50) + 10;
+            
+            document.body.appendChild(bubble);
+            
+            // 不删除弹幕，让它们持续堆叠
+        }
+
+        // 显示信封
+        function showEnvelope() {
+            setTimeout(() => {
+                const envelopeContainer = document.getElementById('envelopeContainer');
+                envelopeContainer.style.display = 'block';
+                // 添加show类触发动画
+                setTimeout(() => {
+                    envelopeContainer.classList.add('show');
+                }, 50);
+                
+                // 显示提示
+                const hint = document.getElementById('startHint');
+                hint.style.display = 'block';
+                setTimeout(() => {
+                    hint.style.display = 'none';
+                }, 4000);
+            }, 6000); // 6秒后出现
+        }
+
+        // 创建流星效果
+        function createShootingStar() {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            star.style.left = Math.random() * window.innerWidth + 'px';
+            star.style.top = Math.random() * 200 + 'px';
+            document.body.appendChild(star);
+            
+            setTimeout(() => {
+                star.remove();
+            }, 1500);
+        }
+
+        // 信封点击事件
+        document.getElementById('envelope').addEventListener('click', function() {
+            this.classList.add('open');
+            
+            // 创建流星效果
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createShootingStar();
+                }, i * 200);
+            }
+            
+            setTimeout(() => {
+                document.getElementById('envelopeContainer').style.display = 'none';
+                document.getElementById('letterContainer').style.display = 'block';
+            }, 1200);
+        });
+
+        // 心形粒子特效
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.envelope') || e.target.closest('.music-control') || 
+                e.target.closest('.letter-paper')) {
+                const hearts = ['❤️', '💖', '💕', '💗', '💝'];
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        const heart = document.createElement('div');
+                        heart.className = 'heart-particle';
+                        heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                        heart.style.left = e.clientX + (Math.random() - 0.5) * 60 + 'px';
+                        heart.style.top = e.clientY + (Math.random() - 0.5) * 60 + 'px';
+                        document.body.appendChild(heart);
+                        
+                        setTimeout(() => {
+                            heart.remove();
+                        }, 2500);
+                    }, i * 60);
+                }
+            }
+        });
+
+        // 开始按钮点击事件
+        document.getElementById('startButton').addEventListener('click', function() {
+            // 隐藏开始按钮
+            this.classList.add('hide');
+            setTimeout(() => {
+                this.style.display = 'none';
+            }, 800);
+            
+            // 标记已开始
+            hasStarted = true;
+            
+            // 开始播放音乐
+            tryPlayMusic();
+            
+            // 开始粒子和弹幕效果
+            createParticles();
+            createWishBubbles();
+            showEnvelope();
+            
+            // 控制台彩蛋
+            console.log('%c🎂 生日快乐！Happy Birthday! 🎂', 
+                'color: #ff6347; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(255,140,0,0.4);');
+            console.log('%c让这份代码，不只是祝福，而是一场温柔的生日仪式。', 
+                'color: #ff69b4; font-size: 18px; font-style: italic;');
+        });
+    </script>
+</body>
+</html>
+
+
