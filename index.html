@@ -102,6 +102,10 @@
             animation: fadeInScale 0.5s ease-out forwards;
             font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
             opacity: 0;
+            will-change: transform, opacity;
+            transform: translate3d(-50%, -50%, 0);
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         @keyframes fadeInScale {
@@ -520,6 +524,24 @@
                 height: 100%;
             }
             
+            /* 手机端禁用背景模糊效果以提升性能 */
+            .background-image {
+                filter: none;
+                opacity: 0.15;
+            }
+            
+            /* 手机端简化弹幕效果 */
+            .wish-bubble {
+                font-size: 12px;
+                padding: 8px 15px;
+                border-radius: 12px;
+                max-width: 80%;
+                white-space: normal;
+                word-break: break-word;
+                backdrop-filter: none;  /* 禁用背景模糊 */
+                box-shadow: 0 3px 10px rgba(255, 140, 0, 0.3);  /* 简化阴影 */
+            }
+            
             .letter-paper {
                 margin: 15px;
                 padding: 25px;
@@ -565,15 +587,6 @@
                 font-size: 25px;
             }
 
-            .wish-bubble {
-                font-size: 12px;
-                padding: 8px 15px;
-                border-radius: 12px;
-                max-width: 80%;
-                white-space: normal;
-                word-break: break-word;
-            }
-
             .start-button {
                 font-size: 22px;
                 padding: 20px 40px;
@@ -597,8 +610,13 @@
             }
             
             .particle {
-                width: 20px;
-                height: 20px;
+                width: 18px;
+                height: 18px;
+            }
+            
+            /* 手机端减少动画复杂度 */
+            .envelope-container {
+                filter: none;
             }
         }
         
@@ -876,6 +894,10 @@
         function createParticles() {
             const container = document.getElementById('particleContainer');
             const particles = ['🎂', '🎈', '🎁', '🎉', '⭐', '✨', '🌸', '🦋', '🌟', '💝', '🎊', '🍰'];
+            const isMobile = isMobileDevice();
+            
+            // 手机端减少粒子生成频率
+            const interval = isMobile ? 2000 : 1000;  // 手机端2秒一个，PC端1秒一个
             
             setInterval(() => {
                 const particle = document.createElement('div');
@@ -883,13 +905,17 @@
                 particle.textContent = particles[Math.floor(Math.random() * particles.length)];
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
-                particle.style.fontSize = (Math.random() * 15 + 15) + 'px';
+                particle.style.fontSize = (Math.random() * (isMobile ? 10 : 15) + (isMobile ? 12 : 15)) + 'px';
+                
+                // 使用will-change优化性能
+                particle.style.willChange = 'transform, opacity';
+                
                 container.appendChild(particle);
                 
                 setTimeout(() => {
                     particle.remove();
                 }, 12000);
-            }, 1000);
+            }, interval);
         }
 
         // 检测是否为移动设备
@@ -902,34 +928,38 @@
         function createWishBubbles() {
             // 根据设备类型调整弹幕数量
             const isMobile = isMobileDevice();
-            const firstWave = isMobile ? 60 : 150;
-            const secondWave = isMobile ? 40 : 100;
-            const thirdWave = isMobile ? 20 : 50;
+            const firstWave = isMobile ? 30 : 150;  // 手机端大幅减少
+            const secondWave = isMobile ? 20 : 100;
+            const thirdWave = isMobile ? 10 : 50;
             
             // 第一波 - 快速铺满屏幕
             for (let i = 0; i < firstWave; i++) {
                 setTimeout(() => {
                     createSingleDanmaku();
-                }, i * (isMobile ? 60 : 40));
+                }, i * (isMobile ? 100 : 40));  // 手机端间隔更长
             }
             
             // 延迟后继续添加更多，确保铺满
-            setTimeout(() => {
-                for (let i = 0; i < secondWave; i++) {
-                    setTimeout(() => {
-                        createSingleDanmaku();
-                    }, i * (isMobile ? 70 : 50));
-                }
-            }, 6000);
+            if (!isMobile || secondWave > 0) {
+                setTimeout(() => {
+                    for (let i = 0; i < secondWave; i++) {
+                        setTimeout(() => {
+                            createSingleDanmaku();
+                        }, i * (isMobile ? 120 : 50));
+                    }
+                }, isMobile ? 4000 : 6000);  // 手机端提前
+            }
             
             // 最后一波补充
-            setTimeout(() => {
-                for (let i = 0; i < thirdWave; i++) {
-                    setTimeout(() => {
-                        createSingleDanmaku();
-                    }, i * (isMobile ? 80 : 60));
-                }
-            }, 11000);
+            if (!isMobile || thirdWave > 0) {
+                setTimeout(() => {
+                    for (let i = 0; i < thirdWave; i++) {
+                        setTimeout(() => {
+                            createSingleDanmaku();
+                        }, i * (isMobile ? 150 : 60));
+                    }
+                }, isMobile ? 7000 : 11000);  // 手机端提前
+            }
             
             // 铺满后就不再生成了
         }
@@ -940,14 +970,20 @@
             bubble.className = 'wish-bubble';
             bubble.textContent = birthdayWishes[Math.floor(Math.random() * birthdayWishes.length)];
             
+            const isMobile = isMobileDevice();
+            
             // 随机位置（覆盖整个屏幕）
             const topPosition = Math.random() * 90 + 5; // 5% 到 95% 的高度
             const leftPosition = Math.random() * 90 + 5; // 5% 到 95% 的宽度
             bubble.style.top = topPosition + '%';
             bubble.style.left = leftPosition + '%';
             
-            // 随机颜色变化
-            const colorVariants = [
+            // 手机端简化颜色
+            const colorVariants = isMobile ? [
+                'linear-gradient(135deg, rgba(255, 218, 185, 0.92) 0%, rgba(255, 182, 193, 0.92) 100%)',
+                'linear-gradient(135deg, rgba(255, 192, 203, 0.92) 0%, rgba(255, 182, 193, 0.92) 100%)',
+                'linear-gradient(135deg, rgba(255, 240, 245, 0.92) 0%, rgba(255, 182, 193, 0.92) 100%)'
+            ] : [
                 'linear-gradient(135deg, rgba(255, 218, 185, 0.92) 0%, rgba(255, 182, 193, 0.92) 100%)',
                 'linear-gradient(135deg, rgba(255, 192, 203, 0.92) 0%, rgba(255, 182, 193, 0.92) 100%)',
                 'linear-gradient(135deg, rgba(255, 228, 181, 0.92) 0%, rgba(255, 218, 185, 0.92) 100%)',
@@ -959,12 +995,13 @@
             bubble.style.background = colorVariants[Math.floor(Math.random() * colorVariants.length)];
             
             // 随机字体大小
-            const fontSize = Math.random() * 5 + 15; // 15-20px
+            const fontSize = Math.random() * 5 + (isMobile ? 12 : 15); // 手机端12-17px，PC端15-20px
             bubble.style.fontSize = fontSize + 'px';
             
             // 随机z-index，增加层叠感
             bubble.style.zIndex = Math.floor(Math.random() * 50) + 10;
             
+            // 使用DocumentFragment提升性能
             document.body.appendChild(bubble);
             
             // 不删除弹幕，让它们持续堆叠
@@ -1033,7 +1070,10 @@
             if (target.closest('.envelope') || target.closest('.music-control') || 
                 target.closest('.letter-paper')) {
                 const hearts = ['❤️', '💖', '💕', '💗', '💝'];
-                const heartCount = isMobileDevice() ? 6 : 10;
+                const isMobile = isMobileDevice();
+                const heartCount = isMobile ? 3 : 10;  // 手机端只生成3个
+                const delay = isMobile ? 80 : 60;  // 手机端间隔更长
+                
                 for (let i = 0; i < heartCount; i++) {
                     setTimeout(() => {
                         const heart = document.createElement('div');
@@ -1041,12 +1081,13 @@
                         heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
                         heart.style.left = clientX + (Math.random() - 0.5) * 60 + 'px';
                         heart.style.top = clientY + (Math.random() - 0.5) * 60 + 'px';
+                        heart.style.willChange = 'transform, opacity';
                         document.body.appendChild(heart);
                         
                         setTimeout(() => {
                             heart.remove();
                         }, 2500);
-                    }, i * 60);
+                    }, i * delay);
                 }
             }
         }
