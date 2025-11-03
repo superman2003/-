@@ -2,7 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>🎂 蜡笔小新的生日祝福 🎂</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500&display=swap');
@@ -509,38 +511,135 @@
             }
         }
 
-        /* 响应式 */
+        /* 响应式 - 手机端优化 */
         @media (max-width: 768px) {
+            body {
+                overflow: hidden;
+                position: fixed;
+                width: 100%;
+                height: 100%;
+            }
+            
             .letter-paper {
-                margin: 25px;
-                padding: 35px;
+                margin: 15px;
+                padding: 25px;
+                max-width: calc(100vw - 30px);
+            }
+            
+            .letter-title {
+                font-size: 28px;
+                margin-bottom: 25px;
             }
             
             .letter-content {
-                font-size: 17px;
+                font-size: 16px;
+                line-height: 1.8;
+            }
+            
+            .letter-ending {
+                font-size: 18px;
+                margin-top: 30px;
+            }
+            
+            .letter-signature {
+                font-size: 20px;
+                margin-top: 20px;
             }
             
             .envelope {
-                width: 240px;
-                height: 160px;
+                width: 220px;
+                height: 150px;
             }
             
             .envelope-flap {
-                border-left: 120px solid transparent;
-                border-right: 120px solid transparent;
-                border-top: 80px solid #ffb6c1;
+                border-left: 110px solid transparent;
+                border-right: 110px solid transparent;
+                border-top: 75px solid #ffb6c1;
+            }
+            
+            .envelope-text {
+                font-size: 20px;
+            }
+            
+            .birthday-icon {
+                font-size: 25px;
             }
 
             .wish-bubble {
-                font-size: 14px;
-                padding: 10px 18px;
-                border-radius: 15px;
+                font-size: 12px;
+                padding: 8px 15px;
+                border-radius: 12px;
+                max-width: 80%;
+                white-space: normal;
+                word-break: break-word;
             }
 
             .start-button {
+                font-size: 22px;
+                padding: 20px 40px;
+                border-radius: 45px;
+                max-width: 80%;
+                text-align: center;
+            }
+            
+            .music-control {
+                width: 55px;
+                height: 55px;
+                font-size: 22px;
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .start-hint {
+                font-size: 16px;
+                padding: 12px 25px;
+                top: 20px;
+            }
+            
+            .particle {
+                width: 20px;
+                height: 20px;
+            }
+        }
+        
+        /* 小屏手机优化 */
+        @media (max-width: 480px) {
+            .letter-paper {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .letter-title {
                 font-size: 24px;
-                padding: 25px 50px;
-                border-radius: 50px;
+            }
+            
+            .letter-content {
+                font-size: 15px;
+            }
+            
+            .envelope {
+                width: 180px;
+                height: 120px;
+            }
+            
+            .envelope-flap {
+                border-left: 90px solid transparent;
+                border-right: 90px solid transparent;
+                border-top: 60px solid #ffb6c1;
+            }
+            
+            .envelope-text {
+                font-size: 16px;
+            }
+            
+            .wish-bubble {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+            
+            .start-button {
+                font-size: 20px;
+                padding: 18px 35px;
             }
         }
     </style>
@@ -793,30 +892,42 @@
             }, 1000);
         }
 
+        // 检测是否为移动设备
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+                   || window.innerWidth <= 768;
+        }
+
         // 生成满屏弹幕祝福 - 堆叠铺满版本（不消失）
         function createWishBubbles() {
-            // 第一波 - 快速铺满屏幕（150个弹幕）
-            for (let i = 0; i < 150; i++) {
+            // 根据设备类型调整弹幕数量
+            const isMobile = isMobileDevice();
+            const firstWave = isMobile ? 60 : 150;
+            const secondWave = isMobile ? 40 : 100;
+            const thirdWave = isMobile ? 20 : 50;
+            
+            // 第一波 - 快速铺满屏幕
+            for (let i = 0; i < firstWave; i++) {
                 setTimeout(() => {
                     createSingleDanmaku();
-                }, i * 40);
+                }, i * (isMobile ? 60 : 40));
             }
             
             // 延迟后继续添加更多，确保铺满
             setTimeout(() => {
-                for (let i = 0; i < 100; i++) {
+                for (let i = 0; i < secondWave; i++) {
                     setTimeout(() => {
                         createSingleDanmaku();
-                    }, i * 50);
+                    }, i * (isMobile ? 70 : 50));
                 }
             }, 6000);
             
             // 最后一波补充
             setTimeout(() => {
-                for (let i = 0; i < 50; i++) {
+                for (let i = 0; i < thirdWave; i++) {
                     setTimeout(() => {
                         createSingleDanmaku();
-                    }, i * 60);
+                    }, i * (isMobile ? 80 : 60));
                 }
             }, 11000);
             
@@ -891,35 +1002,45 @@
             }, 1500);
         }
 
-        // 信封点击事件
-        document.getElementById('envelope').addEventListener('click', function() {
-            this.classList.add('open');
-            
-            // 创建流星效果
-            for (let i = 0; i < 5; i++) {
+        // 信封点击/触摸事件
+        function openEnvelope() {
+            const envelope = document.getElementById('envelope');
+            if (!envelope.classList.contains('open')) {
+                envelope.classList.add('open');
+                
+                // 创建流星效果
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        createShootingStar();
+                    }, i * 200);
+                }
+                
                 setTimeout(() => {
-                    createShootingStar();
-                }, i * 200);
+                    document.getElementById('envelopeContainer').style.display = 'none';
+                    document.getElementById('letterContainer').style.display = 'block';
+                }, 1200);
             }
-            
-            setTimeout(() => {
-                document.getElementById('envelopeContainer').style.display = 'none';
-                document.getElementById('letterContainer').style.display = 'block';
-            }, 1200);
+        }
+        
+        document.getElementById('envelope').addEventListener('click', openEnvelope);
+        document.getElementById('envelope').addEventListener('touchend', function(e) {
+            e.preventDefault();
+            openEnvelope();
         });
 
-        // 心形粒子特效
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.envelope') || e.target.closest('.music-control') || 
-                e.target.closest('.letter-paper')) {
+        // 心形粒子特效（支持点击和触摸）
+        function createHeartParticles(clientX, clientY, target) {
+            if (target.closest('.envelope') || target.closest('.music-control') || 
+                target.closest('.letter-paper')) {
                 const hearts = ['❤️', '💖', '💕', '💗', '💝'];
-                for (let i = 0; i < 10; i++) {
+                const heartCount = isMobileDevice() ? 6 : 10;
+                for (let i = 0; i < heartCount; i++) {
                     setTimeout(() => {
                         const heart = document.createElement('div');
                         heart.className = 'heart-particle';
                         heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
-                        heart.style.left = e.clientX + (Math.random() - 0.5) * 60 + 'px';
-                        heart.style.top = e.clientY + (Math.random() - 0.5) * 60 + 'px';
+                        heart.style.left = clientX + (Math.random() - 0.5) * 60 + 'px';
+                        heart.style.top = clientY + (Math.random() - 0.5) * 60 + 'px';
                         document.body.appendChild(heart);
                         
                         setTimeout(() => {
@@ -928,14 +1049,28 @@
                     }, i * 60);
                 }
             }
+        }
+        
+        document.addEventListener('click', (e) => {
+            createHeartParticles(e.clientX, e.clientY, e.target);
+        });
+        
+        document.addEventListener('touchend', (e) => {
+            if (e.changedTouches && e.changedTouches.length > 0) {
+                const touch = e.changedTouches[0];
+                createHeartParticles(touch.clientX, touch.clientY, e.target);
+            }
         });
 
-        // 开始按钮点击事件
-        document.getElementById('startButton').addEventListener('click', function() {
+        // 开始按钮点击/触摸事件
+        function startBirthday() {
+            const startButton = document.getElementById('startButton');
+            if (startButton.style.display === 'none') return;
+            
             // 隐藏开始按钮
-            this.classList.add('hide');
+            startButton.classList.add('hide');
             setTimeout(() => {
-                this.style.display = 'none';
+                startButton.style.display = 'none';
             }, 800);
             
             // 标记已开始
@@ -954,6 +1089,12 @@
                 'color: #ff6347; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(255,140,0,0.4);');
             console.log('%c让这份代码，不只是祝福，而是一场温柔的生日仪式。', 
                 'color: #ff69b4; font-size: 18px; font-style: italic;');
+        }
+        
+        document.getElementById('startButton').addEventListener('click', startBirthday);
+        document.getElementById('startButton').addEventListener('touchend', function(e) {
+            e.preventDefault();
+            startBirthday();
         });
     </script>
 </body>
